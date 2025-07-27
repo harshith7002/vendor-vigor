@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, ShoppingCart, User, Bell } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { Menu, ShoppingCart, User, Bell, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface HeaderProps {
@@ -10,6 +12,17 @@ interface HeaderProps {
 
 export const Header = ({ currentView, onViewChange }: HeaderProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const handleAuthClick = () => {
+    navigate("/auth");
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+    onViewChange("home");
+  };
 
   const navItems = [
     { id: "home", label: "Home", icon: null },
@@ -52,16 +65,31 @@ export const Header = ({ currentView, onViewChange }: HeaderProps) => {
           </nav>
 
           {/* Desktop Actions */}
-          <div className="hidden md:flex items-center space-x-2">
-            <Button variant="ghost" size="icon">
-              <Bell className="w-4 h-4" />
-            </Button>
-            <Button variant="outline">
-              Login
-            </Button>
-            <Button variant="hero">
-              Sign Up
-            </Button>
+          <div className="hidden md:flex items-center space-x-4">
+            {user ? (
+              <>
+                <Button variant="ghost" size="icon">
+                  <Bell className="w-4 h-4" />
+                </Button>
+                <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+                  <User className="w-4 h-4" />
+                  <span>{user.email}</span>
+                </div>
+                <Button variant="outline" onClick={handleSignOut}>
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button variant="outline" onClick={handleAuthClick}>
+                  Login
+                </Button>
+                <Button variant="hero" onClick={handleAuthClick}>
+                  Sign Up
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -94,8 +122,23 @@ export const Header = ({ currentView, onViewChange }: HeaderProps) => {
                 </Button>
               ))}
               <div className="flex space-x-2 pt-2">
-                <Button variant="outline" className="flex-1">Login</Button>
-                <Button variant="hero" className="flex-1">Sign Up</Button>
+                {user ? (
+                  <>
+                    <div className="flex items-center space-x-2 text-sm text-muted-foreground p-2">
+                      <User className="w-4 h-4" />
+                      <span>{user.email}</span>
+                    </div>
+                    <Button variant="outline" className="flex-1" onClick={handleSignOut}>
+                      <LogOut className="w-4 h-4 mr-2" />
+                      Logout
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button variant="outline" className="flex-1" onClick={handleAuthClick}>Login</Button>
+                    <Button variant="hero" className="flex-1" onClick={handleAuthClick}>Sign Up</Button>
+                  </>
+                )}
               </div>
             </div>
           </div>
