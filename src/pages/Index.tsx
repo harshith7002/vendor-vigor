@@ -1,12 +1,30 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState } from "react";
+import { Header } from "@/components/Header";
+import { HomePage } from "@/components/HomePage";
+import { VendorDashboard } from "@/components/VendorDashboard";
+import { SupplierDashboard } from "@/components/SupplierDashboard";
+import { Marketplace } from "@/components/Marketplace";
 
 const Index = () => {
+  const [currentView, setCurrentView] = useState("home");
+
+  const renderCurrentView = () => {
+    switch (currentView) {
+      case "vendor-dashboard":
+        return <VendorDashboard />;
+      case "supplier-dashboard":
+        return <SupplierDashboard />;
+      case "marketplace":
+        return <Marketplace />;
+      default:
+        return <HomePage onViewChange={setCurrentView} />;
+    }
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen bg-background">
+      <Header currentView={currentView} onViewChange={setCurrentView} />
+      {renderCurrentView()}
     </div>
   );
 };
